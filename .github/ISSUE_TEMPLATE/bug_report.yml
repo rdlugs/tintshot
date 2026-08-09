@@ -1,0 +1,50 @@
+name: Bug report
+description: Report something that does not work as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please do not attach screenshots that contain
+        confidential or personally identifiable content.
+
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: What happened
+      description: What you expected to happen, and what happened instead.
+      placeholder: |
+        Expected: exporting at 3x produces a 3000x2000 PNG.
+        Actual: the PNG is 1000x667.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include a sample image when it helps reproduce the problem.
+      placeholder: |
+        1. Paste a screenshot
+        2. Select the browser frame and the 16:9 ratio
+        3. Export at 3x
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, operating system, and Node.js version.
+      placeholder: Firefox 141, Fedora 44, Node 22.22.2
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors or screenshots
+      description: Any relevant console output. This is automatically formatted as code.
+      render: text
+    validations:
+      required: false

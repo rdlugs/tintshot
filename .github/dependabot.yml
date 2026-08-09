@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      # Group only minor and patch updates. Majors get their own pull request
+      # so one blocked major cannot hold back routine updates.
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # typescript-eslint peers on typescript ">=4.8.4 <6.1.0", so TypeScript 6
+      # and 7 cannot be installed alongside the linter. npm ci fails to resolve
+      # before any code runs. Remove this once typescript-eslint supports them.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly

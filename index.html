@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tintshot — screenshots that tint themselves</title>
+    <meta
+      name="description"
+      content="Turn plain screenshots into polished images with a background picked from the image's own colors. 100% in your browser."
+    />
+    <!--
+      Resolve the editor theme before the first paint. The stylesheet keys its
+      palettes off a concrete data-theme, so this has to run here rather than in
+      React: by the time the bundle executes, the browser has already painted the
+      background and the user has seen a flash of the wrong theme.
+      Keep the storage key and the resolution order in sync with src/hooks/useTheme.ts.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("tintshot:theme");
+          var mode = stored === "light" || stored === "dark" ? stored : "system";
+          var resolved =
+            mode === "system"
+              ? window.matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark"
+              : mode;
+          document.documentElement.dataset.theme = resolved;
+          document.documentElement.style.colorScheme = resolved;
+        } catch (error) {
+          // Storage can throw outright (Safari private browsing), and a themeless
+          // document is still perfectly usable — it just falls back to dark.
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

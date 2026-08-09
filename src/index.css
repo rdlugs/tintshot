@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+/* Design tokens. These were `:root` custom properties before the Tailwind
+   move; as `@theme` entries they also generate the matching utilities, so
+   `--color-surface` gives `bg-surface`, `text-surface`, `border-surface`, …
+
+   The values here are the *dark* palette and act as the defaults. The light
+   palette below re-declares the same custom properties under
+   `:root[data-theme="light"]`; because Tailwind v4 compiles `bg-surface` down to
+   `background-color: var(--color-surface)`, overriding the property re-themes
+   every existing utility — opacity modifiers like `bg-bg/85` included, since
+   those become `color-mix(… var(--color-bg) …)`.
+
+   `static` keeps every property in the output even when it is only referenced
+   from the override block, which the colors used solely by @utility rules are. */
+@theme static {
+  --color-bg: #0a0b0d;
+  --color-surface: #111316;
+  --color-surface-raised: #17191d;
+  --color-surface-soft: #1d2025;
+  /* Recessed panes: the inspector column and the export summary. */
+  --color-surface-sunken: #0f1114;
+  /* A barely-there wash used to lift a block off the surface behind it. */
+  --color-surface-tint: rgba(255, 255, 255, 0.035);
+  --color-line: #292c32;
+  --color-line-strong: #3a3e46;
+  /* Hairlines that read as a seam rather than a border. */
+  --color-line-soft: rgba(255, 255, 255, 0.075);
+  --color-text: #f1f2ed;
+  --color-muted: #8d929b;
+  --color-muted-strong: #b6bac0;
+  /* Lightened from #676c75, which sat at 3.5:1 against the dark surfaces and
+     missed AA for the 8–10px labels that use it. */
+  --color-faint: #7a7f88;
+
+  /* `accent` fills (buttons, the logo chip, the toggle knob) and stays brand
+     yellow in both themes; `accent-ink` is the same accent as *text or border on
+     a surface*, which has to darken in light mode to stay readable. */
+  --color-accent: #dce75a;
+  --color-accent-hover: #e6f166;
+  /* Ink drawn on top of an accent fill. */
+  --color-accent-dark: #171a08;
+  --color-accent-ink: #dce75a;
+  --color-accent-line: #555d2d;
+  --color-danger: #ff8a80;
+
+  /* Slider tracks and the toggle rail, plus the toggle's off-state knob. */
+  --color-track: #363a42;
+  --color-knob: #8b9099;
+  /* The ring and rim that separate a slider thumb from the track under it. */
+  --color-control-edge: #15171b;
+  --color-control-ring: #7c833a;
+
+  /* Toast palettes. */
+  --color-notice-surface: #1a1d12;
+  --color-notice-line: #475025;
+  --color-notice-text: #e5e9bb;
+  --color-danger-surface: #211514;
+  --color-danger-line: #5f3330;
+  --color-danger-text: #ffc1bb;
+
+  /* The preview stage backdrop behind the canvas. */
+  --color-stage: #0e1013;
+  --color-stage-dot: rgba(255, 255, 255, 0.018);
+  --color-stage-inset: rgba(0, 0, 0, 0.22);
+  /* Dot texture on the drop card. */
+  --color-dot: rgba(255, 255, 255, 0.14);
+  /* Tint behind the page's top-left corner glow. */
+  --color-glow: rgba(126, 140, 66, 0.07);
+  /* Cast shadows. Light surfaces need a much softer one than dark surfaces. */
+  --color-shadow: rgba(0, 0, 0, 0.32);
+
+  --radius-panel: 14px;
+  --radius-card: 22px;
+
+  --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  /* Only the two breakpoints the layout actually uses, so `max-lg:` is the old
+     `max-width: 980px` query and `max-sm:` the old `max-width: 640px` one. */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 641px;
+  --breakpoint-lg: 981px;
+}
+
+@layer base {
+  :root {
+    font-family: var(--font-sans);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* An inline script in index.html resolves the stored preference (or the OS
+     one) and stamps a concrete `data-theme` before first paint, so these two
+     blocks are the only palettes the stylesheet needs — no `prefers-color-scheme`
+     media query, and no flash of the wrong theme. */
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+
+    --color-bg: #f4f4f0;
+    --color-surface: #ffffff;
+    --color-surface-raised: #ffffff;
+    --color-surface-soft: #ecece6;
+    --color-surface-sunken: #f0f0ea;
+    --color-surface-tint: rgba(20, 22, 26, 0.028);
+    --color-line: #dedcd4;
+    --color-line-strong: #b8b6ac;
+    --color-line-soft: rgba(20, 22, 26, 0.1);
+    --color-text: #14161a;
+    --color-muted: #565c65;
+    --color-muted-strong: #33373e;
+    --color-faint: #626771;
+
+    /* The fill stays brand yellow; only the on-surface ink darkens. */
+    --color-accent-ink: #545e0e;
+    --color-accent-line: #77812c;
+    --color-danger: #9c211a;
+
+    --color-track: #cfcec5;
+    --color-knob: #686d76;
+    --color-control-edge: #ffffff;
+    /* The yellow thumb has almost no contrast against a light rail, so this ring
+       is what actually identifies the slider handle: 4:1 against the track. */
+    --color-control-ring: #5c6522;
+
+    --color-notice-surface: #f3f5e2;
+    --color-notice-line: #b3bd76;
+    --color-notice-text: #3f4712;
+    --color-danger-surface: #fdeceb;
+    --color-danger-line: #e5a9a4;
+    --color-danger-text: #8c1d16;
+
+    --color-stage: #e6e6e0;
+    --color-stage-dot: rgba(20, 22, 26, 0.022);
+    --color-stage-inset: rgba(20, 22, 26, 0.06);
+    --color-dot: rgba(20, 22, 26, 0.11);
+    --color-glow: rgba(126, 140, 66, 0.09);
+    --color-shadow: rgba(20, 22, 26, 0.1);
+  }
+
+  html {
+    min-width: 320px;
+    background: var(--color-bg);
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    color: var(--color-text);
+    background:
+      radial-gradient(circle at 12% 0%, var(--color-glow), transparent 27rem), var(--color-bg);
+  }
+
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.38;
+  }
+
+  /* `accent-ink` rather than `accent`: the bright yellow all but disappears
+     against a light surface, and the ink token is exactly the accent that stays
+     legible on whatever surface the theme puts behind it. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-ink);
+    outline-offset: 3px;
+  }
+
+  /* The desktop editor fills the viewport and scrolls only its inspector, which
+     means the page behind it must not scroll. <body> is outside the React tree,
+     so App toggles this class on it directly. */
+  @media (min-width: 981px) {
+    body.is-editing {
+      height: 100dvh;
+      overflow: hidden;
+    }
+  }
+
+  /* Vendor-prefixed shadow parts below have no utility equivalent. */
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 16px;
+    margin: 0;
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: 4px;
+    background: var(--color-track);
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+    margin-top: -5.5px;
+    appearance: none;
+    border: 2px solid var(--color-control-edge);
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-control-ring);
+  }
+
+  input[type="range"]::-moz-range-track {
+    height: 3px;
+    border-radius: 4px;
+    background: var(--color-track);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--color-control-edge);
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-control-ring);
+  }
+
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  input[type="color"]::-webkit-color-swatch {
+    border: 0;
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important;
+    }
+  }
+}
+
+@utility stage-checkerboard {
+  /* A four-gradient checkerboard; too many coordinated values to inline. */
+  background-color: var(--color-stage);
+  background-image:
+    linear-gradient(45deg, var(--color-stage-dot) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-stage-dot) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-stage-dot) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-stage-dot) 75%);
+  background-size: 24px 24px;
+  background-position:
+    0 0,
+    0 12px,
+    12px -12px,
+    -12px 0;
+  box-shadow: inset 0 0 90px var(--color-stage-inset);
+}
+
+@utility transparency-checkerboard {
+  /* This sits behind the canvas bitmap, so it reveals alpha in the preview but
+     never becomes part of downloaded or copied PNGs. Deliberately untokenized:
+     the conventional neutral grey checkerboard is what makes transparency
+     readable, and tinting it per theme would misrepresent the alpha. */
+  background-color: #b9bcc1;
+  background-image:
+    linear-gradient(45deg, #e3e4e6 25%, transparent 25%),
+    linear-gradient(-45deg, #e3e4e6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e3e4e6 75%),
+    linear-gradient(-45deg, transparent 75%, #e3e4e6 75%);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
+}
+
+@utility dot-grid-fade {
+  /* Dot texture that fades out toward the bottom of the drop card. */
+  background-image: radial-gradient(var(--color-dot) 0.7px, transparent 0.7px);
+  background-size: 14px 14px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
